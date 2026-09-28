@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, Outlet, createFileRoute, useLocation } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { ChevronRight, UserPlus } from 'lucide-react';
 import { AppHeader, PageShell } from '@/components/AppHeader';
@@ -20,6 +20,10 @@ export const Route = createFileRoute('/_authenticated/instructor')({
 type Session = Tables<'sessions'>;
 type Profile = Tables<'profiles'>;
 function InstructorPage() {
+  const location = useLocation();
+  return location.pathname === '/instructor' ? <InstructorDashboard /> : <Outlet />;
+}
+function InstructorDashboard() {
   const { isInstructor, loading } = useAuth();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});

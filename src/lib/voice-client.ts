@@ -25,8 +25,8 @@ function decodePCM(pending: Uint8Array, incoming: Uint8Array) {
 }
 
 /** Streams spoken audio for `text` and resolves when playback ends. */
-export async function speak(text: string): Promise<void> {
-  const context = new AudioContext({ sampleRate: 24000 });
+export async function speak(text: string, sessionAudio?: { context: AudioContext; destination: MediaStreamAudioDestinationNode }): Promise<void> {
+  const context = sessionAudio?.context ?? new AudioContext({ sampleRate: 24000 });
   const sources = new Set<AudioBufferSourceNode>();
   let playhead = 0;
   let pending = new Uint8Array(0);
@@ -61,6 +61,7 @@ export async function speak(text: string): Promise<void> {
         const source = context.createBufferSource();
         source.buffer = buffer;
         source.connect(context.destination);
+        if (sessionAudio) source.connect(sessionAudio.destination);
         sources.add(source);
         playback = new Promise<void>((resolve) => {
           source.onended = () => {
@@ -90,7 +91,7 @@ export async function speak(text: string): Promise<void> {
         /* already stopped */
       }
     }
-    await context.close();
+    if (!sessionAudio) await context.close();
   }
 }
 

@@ -94,6 +94,7 @@ function SessionPage() {
           setPause(true);
           setStatus('Camera or microphone disconnected. Reconnect both to continue.');
           void flag('device_off', 'Camera or microphone disconnected.');
+          if (answerRecorder.current?.state === 'recording') { answerRecorder.current.stop(); answerRecorder.current = null; setRecordingAnswer(false); setDraft(''); }
         }
         return;
       }
@@ -146,7 +147,7 @@ function SessionPage() {
       await storeTurn({ role: 'probe', content: result.text });
       if (result.closing) { await finish(); return; }
       setStatus('CTC Bot is speaking…');
-      await speak(result.text);
+      await speak(result.text, media.current?.speechAudio);
       setStatus('Ready for your answer.');
     } catch (e) { setError(e instanceof Error ? e.message : 'Could not load the question.'); setStatus('Question is shown above; you can continue.'); }
     finally { setBusyState(false); }
@@ -182,7 +183,7 @@ function SessionPage() {
   }
   async function endAnswer() {
     const recorder = answerRecorder.current;
-    if (!recorder || recorder.state === 'inactive') return;
+    if (!recorder || recorder.state === 'inactive' || paused) return;
     await new Promise<void>(resolve => { recorder.addEventListener('stop', () => resolve(), { once: true }); recorder.stop(); });
     answerRecorder.current = null; setRecordingAnswer(false);
     if (Date.now() - answerStart.current < 800 || !answerChunks.current.length) { setError('That recording was too short. Record your answer again.'); return; }
@@ -238,7 +239,7 @@ function SessionPage() {
       <main className="min-w-0 space-y-6">
         {phase === 'check' ? <section className="space-y-5"><h2 className="font-display text-2xl font-semibold">Camera & microphone check</h2><p className="text-sm text-muted-foreground">Both must stay on. Your video and audio are saved for instructor review; leaving the page or unusual face counts will be flagged.</p><div className="flex gap-3"><Button disabled={busy} onClick={() => void connect()}><Camera /> {media.current?.healthy ? 'Reconnect devices' : 'Enable camera & mic'}</Button><Button disabled={!media.current?.healthy || busy} variant="outline" onClick={() => void start()}><Play /> Start session</Button></div></section> : <section><div className="mb-5 flex items-center justify-between border-b border-border pb-4"><div><h2 className="font-display text-2xl font-semibold">{phase === 'finished' ? 'Session complete' : 'Conversation'}</h2><p className="mt-1 font-mono text-xs text-muted-foreground">{Math.min(questions, 5)} / 5 questions</p></div><span className="text-xs text-muted-foreground">{flags.length} {flags.length === 1 ? 'warning' : 'warnings'}</span></div>
           <div aria-live="polite" className="space-y-4">{turns.map((turn, i) => <div key={i} className={`max-w-[90%] border-l-2 px-4 py-3 text-sm leading-relaxed ${turn.role === 'probe' ? 'border-primary bg-accent/60' : 'ml-auto border-foreground bg-secondary'}`}><p className="mb-1 font-mono text-[10px] uppercase text-muted-foreground">{turn.role === 'probe' ? 'CTC Bot' : 'Your answer'}</p>{turn.content}</div>)}</div>
-          {phase === 'session' && <div className="mt-8 border-t border-border pt-5"><p className="mb-3 text-xs text-muted-foreground" role="status">{paused ? 'Paused — reconnect camera and microphone to continue.' : status}</p>{paused ? <Button onClick={() => void connect()} disabled={busy}><RotateCcw /> Reconnect devices</Button> : <div className="space-y-3">{draft && <div className="border border-border bg-surface p-4 text-sm"><p className="mb-2 font-mono text-[10px] uppercase text-muted-foreground">Your recorded answer</p>{draft}</div>}<div className="flex flex-wrap gap-2">{recordingAnswer ? <Button onClick={() => void endAnswer()}><Square /> Done</Button> : <Button disabled={busy || !turns.length || turns.at(-1)?.role !== 'probe' || questions > 5} onClick={beginAnswer}>{draft ? <RotateCcw /> : <Mic />} {draft ? 'Re-record' : 'Answer'}</Button>}{draft && <Button disabled={busy} onClick={() => void sendAnswer()}><Send /> Send answer</Button>}{!draft && turns.at(-1)?.role === 'student' && !busy && <Button variant="outline" onClick={() => void nextQuestion(turnsRef.current, turnsRef.current.filter(t => t.role === 'student').length + 1)}>Retry question</Button>}{questions > 5 && phase === 'session' && !busy && <Button variant="outline" onClick={() => void finish()}>Retry saving recording</Button>}</div></div>}</div>}
+          {phase === 'session' && <div className="mt-8 border-t border-border pt-5"><p className="mb-3 text-xs text-muted-foreground" role="status">{paused ? 'Paused — reconnect camera and microphone to continue.' : status}</p>{paused ? <Button onClick={() => void connect()} disabled={busy}><RotateCcw /> Reconnect devices</Button> : <div className="space-y-3">{draft && <div className="border border-border bg-surface p-4 text-sm"><p className="mb-2 font-mono text-[10px] uppercase text-muted-foreground">Your recorded answer</p>{draft}</div>}<div className="flex flex-wrap gap-2">{recordingAnswer ? <Button onClick={() => void endAnswer()}><Square /> Done</Button> : <Button disabled={busy || !turns.length || turns.at(-1)?.role !== 'probe' || questions > 5} onClick={beginAnswer}>{draft ? <RotateCcw /> : <Mic />} {draft ? 'Re-record' : 'Answer'}</Button>}{draft && <Button disabled={busy} onClick={() => void sendAnswer()}><Send /> Send answer</Button>}{!draft && !turns.length && !busy && <Button variant="outline" onClick={() => void nextQuestion([], 1)}>Retry first question</Button>}{!draft && turns.at(-1)?.role === 'student' && !busy && <Button variant="outline" onClick={() => void nextQuestion(turnsRef.current, turnsRef.current.filter(t => t.role === 'student').length + 1)}>Retry question</Button>}{questions > 5 && phase === 'session' && !busy && <Button variant="outline" onClick={() => void finish()}>Retry saving recording</Button>}</div></div>}</div>}
           {phase === 'finished' && <p className="mt-6 border-t border-border pt-5 text-sm text-muted-foreground">Your recording and transcript are saved for your instructor.</p>}
         </section>}
       </main>

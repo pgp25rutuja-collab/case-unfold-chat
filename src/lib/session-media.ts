@@ -20,6 +20,7 @@ export class SessionMedia {
   }
 
   get preview() { return this.video; }
+  get speechAudio() { return { context: this.audio, destination: this.destination }; }
   get healthy() { return !!this.stream && this.stream.getVideoTracks().some(t => t.readyState === 'live' && !t.muted && t.enabled) && this.stream.getAudioTracks().some(t => t.readyState === 'live' && !t.muted && t.enabled); }
   get active() { return this.recorder?.state === 'recording'; }
 

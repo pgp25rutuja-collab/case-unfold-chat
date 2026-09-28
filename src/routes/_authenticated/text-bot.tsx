@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { askProbe } from "@/lib/probe.functions";
 import { extractText } from "@/lib/extract-text";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/text-bot")({
   head: () => ({
     meta: [
       { title: "CTC Bot — Critical Thinking Chat Bot for case studies" },

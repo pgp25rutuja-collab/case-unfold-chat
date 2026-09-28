@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedInstructorRouteImport } from './routes/_authenticated/instructor'
 import { Route as AuthenticatedSessionRouteImport } from './routes/_authenticated/session'
+import { Route as AuthenticatedTextBotRouteImport } from './routes/_authenticated/text-bot'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as AuthenticatedInstructorSessionIdRouteImport } from './routes/_authenticated/instructor/$sessionId'
@@ -42,6 +43,11 @@ const AuthenticatedSessionRoute = AuthenticatedSessionRouteImport.update({
   path: '/session',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTextBotRoute = AuthenticatedTextBotRouteImport.update({
+  id: '/text-bot',
+  path: '/text-bot',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiSttRoute = ApiSttRouteImport.update({
   id: '/api/stt',
   path: '/api/stt',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/session': typeof AuthenticatedSessionRoute
+  '/text-bot': typeof AuthenticatedTextBotRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
   '/instructor/$sessionId': typeof AuthenticatedInstructorSessionIdRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/session': typeof AuthenticatedSessionRoute
+  '/text-bot': typeof AuthenticatedTextBotRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
   '/instructor/$sessionId': typeof AuthenticatedInstructorSessionIdRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/_authenticated/session': typeof AuthenticatedSessionRoute
+  '/_authenticated/text-bot': typeof AuthenticatedTextBotRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
   '/_authenticated/instructor/$sessionId': typeof AuthenticatedInstructorSessionIdRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/instructor'
     | '/session'
+    | '/text-bot'
     | '/api/stt'
     | '/api/tts'
     | '/instructor/$sessionId'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/instructor'
     | '/session'
+    | '/text-bot'
     | '/api/stt'
     | '/api/tts'
     | '/instructor/$sessionId'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/instructor'
     | '/_authenticated/session'
+    | '/_authenticated/text-bot'
     | '/api/stt'
     | '/api/tts'
     | '/_authenticated/instructor/$sessionId'
@@ -164,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSessionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/text-bot': {
+      id: '/_authenticated/text-bot'
+      path: '/text-bot'
+      fullPath: '/text-bot'
+      preLoaderRoute: typeof AuthenticatedTextBotRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/stt': {
       id: '/api/stt'
       path: '/api/stt'
@@ -206,11 +225,13 @@ const AuthenticatedInstructorRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedInstructorRoute: typeof AuthenticatedInstructorRouteWithChildren
   AuthenticatedSessionRoute: typeof AuthenticatedSessionRoute
+  AuthenticatedTextBotRoute: typeof AuthenticatedTextBotRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInstructorRoute: AuthenticatedInstructorRouteWithChildren,
   AuthenticatedSessionRoute: AuthenticatedSessionRoute,
+  AuthenticatedTextBotRoute: AuthenticatedTextBotRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

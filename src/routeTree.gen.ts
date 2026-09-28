@@ -16,6 +16,7 @@ import { Route as AuthenticatedInstructorRouteImport } from './routes/_authentic
 import { Route as AuthenticatedSessionRouteImport } from './routes/_authenticated/session'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
+import { Route as AuthenticatedInstructorSessionIdRouteImport } from './routes/_authenticated/instructor/$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,39 +52,61 @@ const ApiTtsRoute = ApiTtsRouteImport.update({
   path: '/api/tts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedInstructorSessionIdRoute =
+  AuthenticatedInstructorSessionIdRouteImport.update({
+    id: '/$sessionId',
+    path: '/$sessionId',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/instructor': typeof AuthenticatedInstructorRoute
+  '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/session': typeof AuthenticatedSessionRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
+  '/instructor/$sessionId': typeof AuthenticatedInstructorSessionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/instructor': typeof AuthenticatedInstructorRoute
+  '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/session': typeof AuthenticatedSessionRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
+  '/instructor/$sessionId': typeof AuthenticatedInstructorSessionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_authenticated/instructor': typeof AuthenticatedInstructorRoute
+  '/_authenticated/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/_authenticated/session': typeof AuthenticatedSessionRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
+  '/_authenticated/instructor/$sessionId': typeof AuthenticatedInstructorSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/instructor' | '/session' | '/api/stt' | '/api/tts'
+    | '/'
+    | '/auth'
+    | '/instructor'
+    | '/session'
+    | '/api/stt'
+    | '/api/tts'
+    | '/instructor/$sessionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/instructor' | '/session' | '/api/stt' | '/api/tts'
+  to:
+    | '/'
+    | '/auth'
+    | '/instructor'
+    | '/session'
+    | '/api/stt'
+    | '/api/tts'
+    | '/instructor/$sessionId'
   id:
     | '__root__'
     | '/'
@@ -93,6 +116,7 @@ export interface FileRouteTypes {
     | '/_authenticated/session'
     | '/api/stt'
     | '/api/tts'
+    | '/_authenticated/instructor/$sessionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,16 +178,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTtsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/instructor/$sessionId': {
+      id: '/_authenticated/instructor/$sessionId'
+      path: '/$sessionId'
+      fullPath: '/instructor/$sessionId'
+      preLoaderRoute: typeof AuthenticatedInstructorSessionIdRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
+    }
   }
 }
 
+interface AuthenticatedInstructorRouteChildren {
+  AuthenticatedInstructorSessionIdRoute: typeof AuthenticatedInstructorSessionIdRoute
+}
+
+const AuthenticatedInstructorRouteChildren: AuthenticatedInstructorRouteChildren =
+  {
+    AuthenticatedInstructorSessionIdRoute:
+      AuthenticatedInstructorSessionIdRoute,
+  }
+
+const AuthenticatedInstructorRouteWithChildren =
+  AuthenticatedInstructorRoute._addFileChildren(
+    AuthenticatedInstructorRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedInstructorRoute: typeof AuthenticatedInstructorRoute
+  AuthenticatedInstructorRoute: typeof AuthenticatedInstructorRouteWithChildren
   AuthenticatedSessionRoute: typeof AuthenticatedSessionRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedInstructorRoute: AuthenticatedInstructorRoute,
+  AuthenticatedInstructorRoute: AuthenticatedInstructorRouteWithChildren,
   AuthenticatedSessionRoute: AuthenticatedSessionRoute,
 }
 

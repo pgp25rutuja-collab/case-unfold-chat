@@ -7,13 +7,13 @@ import { extractText } from "@/lib/extract-text";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Case Reasoning Probe — Socratic case practice for MBA students" },
+      { title: "CTC Bot — Critical Thinking Chat Bot for case studies" },
       {
         name: "description",
         content:
           "Upload a case study and answer one precise question at a time. The probe tests assumptions, evidence and counterarguments, and never gives you the answer.",
       },
-      { property: "og:title", content: "Case Reasoning Probe" },
+      { property: "og:title", content: "CTC Bot — Critical Thinking Chat Bot" },
       {
         property: "og:description",
         content:
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
 
 type Turn = { role: "probe" | "student"; content: string };
 
-const TOTAL = 7;
+const TOTAL = 5;
 
 function Index() {
   const ask = useServerFn(askProbe);
@@ -104,7 +104,7 @@ function Index() {
 
   const download = useCallback(() => {
     const lines = [
-      "Case Reasoning Probe — transcript",
+      "CTC Bot — transcript",
       `Case: ${caseName}`,
       `Date: ${new Date().toLocaleString()}`,
       "",
@@ -114,7 +114,7 @@ function Index() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `case-probe-transcript.txt`;
+    a.download = `ctc-bot-transcript.txt`;
     a.click();
     URL.revokeObjectURL(url);
   }, [turns, caseName]);
@@ -134,7 +134,7 @@ function Index() {
               <span className="font-display text-lg font-bold leading-none text-primary">C</span>
             </div>
             <div>
-              <p className="font-display text-lg font-bold leading-none tracking-tight">Case Reasoning Probe</p>
+              <p className="font-display text-lg font-bold leading-none tracking-tight">CTC Bot</p>
               <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                 Critical thinking, one question at a time
               </p>
@@ -207,7 +207,7 @@ function Index() {
               </button>
 
               <div className="mt-5 space-y-2">
-                {["Reads the full case first", "One question per turn", `Closes after ~${TOTAL} exchanges`].map((t) => (
+                {["Reads the full case first", "One question per turn", `${TOTAL} questions per case`].map((t) => (
                   <div key={t} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="size-1.5 rounded-full bg-primary" /> {t}
                   </div>
@@ -226,7 +226,7 @@ function Index() {
                   <span className="truncate text-sm font-medium">{caseName || "No case loaded"}</span>
                 </div>
                 <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-                  {Math.min(probeCount, TOTAL)} of {TOTAL}
+                  {Math.min(probeCount, TOTAL)} of {TOTAL} questions
                 </span>
               </div>
 

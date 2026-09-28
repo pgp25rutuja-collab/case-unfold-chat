@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { ModelMessage } from "ai";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const schema = z.object({
   caseText: z.string().min(1),
@@ -63,6 +64,7 @@ function buildMessages(input: z.infer<typeof schema>): ModelMessage[] {
 }
 
 export const askProbe = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .validator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
     const { generateProbeText } = await import("./ai.server");

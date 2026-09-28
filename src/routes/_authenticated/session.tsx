@@ -64,6 +64,7 @@ function SessionPage() {
     setFlags(flagsRef.current);
     const { error } = await supabase.from('session_flags').insert({ session_id: id, ...entry });
     if (error) setError(`Warning could not be saved: ${error.message}`);
+    else await supabase.from('sessions').update({ flag_count: flagsRef.current.length }).eq('id', id);
   }, []);
   const storeTurn = async (turn: Turn) => {
     const id = sessionIdRef.current;

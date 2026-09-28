@@ -43,9 +43,9 @@ export async function speak(text: string, sessionAudio?: { context: AudioContext
     let failure: Error | null = null;
     const parser = createParser({
       onEvent(event) {
-        const payload = JSON.parse(event.data) as { type: string; audio?: string; error?: unknown };
+        const payload = JSON.parse(event.data) as { type: string; audio?: string; error?: { message?: string; code?: string } | string; message?: string };
         if (payload.type === "error" || payload.error) {
-          failure = new Error("Speech failed.");
+          failure = new Error(typeof payload.error === 'string' ? payload.error : payload.error?.message ?? payload.message ?? 'Speech failed.');
           return;
         }
         if (payload.type === "speech.audio.done") {
@@ -107,8 +107,8 @@ export async function transcribe(audio: Blob): Promise<string> {
   const parser = createParser({
     onEvent(event) {
       if (event.data === "[DONE]") return;
-      const payload = JSON.parse(event.data) as { type?: string; delta?: string; text?: string; error?: unknown };
-      if (payload.error || payload.type === "error") failure = new Error("Transcription failed.");
+      const payload = JSON.parse(event.data) as { type?: string; delta?: string; text?: string; error?: { message?: string } | string; message?: string };
+      if (payload.error || payload.type === "error") failure = new Error(typeof payload.error === 'string' ? payload.error : payload.error?.message ?? payload.message ?? 'Transcription failed.');
       else if (payload.type === "transcript.text.delta" && payload.delta) text += payload.delta;
       else if (payload.type === "transcript.text.done") final = payload.text ?? text;
     },

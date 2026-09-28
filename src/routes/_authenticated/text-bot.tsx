@@ -1,26 +1,27 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { Button } from "@/components/ui/button";
 import { askProbe } from "@/lib/probe.functions";
 import { extractText } from "@/lib/extract-text";
 
 export const Route = createFileRoute("/_authenticated/text-bot")({
   head: () => ({
     meta: [
-      { title: "CTC Bot — Critical Thinking Chat Bot for case studies" },
+      { title: "Text case discussion — CTC Bot" },
       {
         name: "description",
         content:
           "Upload a case study and answer one precise question at a time. The probe tests assumptions, evidence and counterarguments, and never gives you the answer.",
       },
-      { property: "og:title", content: "CTC Bot — Critical Thinking Chat Bot" },
+      { property: "og:title", content: "Text case discussion — CTC Bot" },
       {
         property: "og:description",
         content:
           "Upload a case study and answer one precise question at a time — assumptions, evidence, counterarguments. No answers given.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,
@@ -71,6 +72,10 @@ function Index() {
 
   const handleFile = useCallback(
     async (file: File) => {
+      if (!/\.(pdf|docx|txt)$/i.test(file.name)) {
+        setError("Choose a PDF, Word (.docx) or text (.txt) file.");
+        return;
+      }
       setError("");
       setBusy(true);
       setTurns([]);
@@ -128,7 +133,7 @@ function Index() {
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6 py-10">
-        <header className="mb-10 flex animate-fade items-center justify-between">
+        <header className="mb-10 flex animate-fade flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="grid size-9 place-items-center rounded-lg bg-primary/10">
               <span className="font-display text-lg font-bold leading-none text-primary">C</span>
@@ -141,6 +146,7 @@ function Index() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Link to="/session" className="mr-3 font-mono text-[10px] uppercase text-primary hover:underline">Voice bot →</Link>
             <span
               className={`rounded-full px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] ring-1 ring-border ${
                 started ? "glass text-muted-foreground" : "bg-primary text-primary-foreground ring-0"
@@ -179,7 +185,7 @@ function Index() {
                   e.target.value = "";
                 }}
               />
-              <button
+              <Button
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 onDragOver={(e) => {
@@ -193,7 +199,8 @@ function Index() {
                   const file = e.dataTransfer.files?.[0];
                   if (file) void handleFile(file);
                 }}
-                className={`w-full rounded-xl border border-dashed p-6 text-center transition-colors ${
+                variant="ghost"
+                className={`h-auto w-full flex-col rounded-md border border-dashed p-6 text-center transition-colors ${
                   dragging ? "border-primary bg-primary/5" : "border-border bg-surface/40 hover:border-primary/50"
                 }`}
               >
@@ -204,7 +211,7 @@ function Index() {
                 <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
                   PDF · DOCX · TXT
                 </p>
-              </button>
+              </Button>
 
               <div className="mt-5 space-y-2">
                 {["Reads the full case first", "One question per turn", `${TOTAL} questions per case`].map((t) => (
@@ -220,7 +227,7 @@ function Index() {
 
           <main className="animate-rise md:col-span-8 [animation-delay:160ms]">
             <div className="glass-strong rounded-2xl p-6 ring-1 ring-border">
-              <div className="mb-5 flex items-center justify-between">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Case</span>
                   <span className="truncate text-sm font-medium">{caseName || "No case loaded"}</span>
@@ -296,25 +303,26 @@ function Index() {
                   placeholder={done ? "This session is complete." : "Type your reply…"}
                   className="glass flex-1 resize-none rounded-xl px-4 py-3 text-sm leading-relaxed ring-1 ring-border outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring disabled:opacity-60"
                 />
-                <button
+                <Button
                   type="button"
                   onClick={() => void send()}
                   disabled={!started || busy || done || !reply.trim()}
-                  className="shrink-0 rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
+                  className="h-auto shrink-0 px-4 py-3"
                 >
                   Send
-                </button>
+                </Button>
               </div>
 
               <div className="mt-4 flex items-center justify-between">
-                <button
+                <Button
                   type="button"
                   onClick={download}
                   disabled={turns.length === 0}
-                  className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+                  variant="ghost"
+                  className="px-0 font-mono text-[11px] uppercase text-muted-foreground hover:text-foreground"
                 >
                   Download transcript
-                </button>
+                </Button>
                 <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
                   {done ? "Session closed" : started ? "Probe active" : "Awaiting case"}
                 </span>

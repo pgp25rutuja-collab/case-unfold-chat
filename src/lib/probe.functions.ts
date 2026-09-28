@@ -30,7 +30,6 @@ Absolute rules:
 function buildMessages(input: z.infer<typeof schema>): ModelMessage[] {
   const { caseText, history, turn, total } = input;
   const messages: ModelMessage[] = [
-    { role: "system", content: SYSTEM },
     {
       role: "user",
       content: `Here is the full case study. Read all of it.\n\n<case>\n${caseText.slice(0, 250000)}\n</case>`,
@@ -64,11 +63,11 @@ function buildMessages(input: z.infer<typeof schema>): ModelMessage[] {
 }
 
 export const askProbe = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => schema.parse(data))
+  .validator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
     const { generateProbeText } = await import("./ai.server");
     try {
-      const text = await generateProbeText(buildMessages(data));
+      const text = await generateProbeText(SYSTEM, buildMessages(data));
       return { text, closing: data.turn >= data.total };
     } catch (error) {
       const status = (error as { statusCode?: number; status?: number })?.statusCode ??

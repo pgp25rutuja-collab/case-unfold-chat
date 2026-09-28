@@ -39,6 +39,7 @@ export async function generateProbeText(
 
   const result = streamText({
     model: provider.responses(MODEL),
+    instructions,
     messages,
     providerOptions: {
       openai: {

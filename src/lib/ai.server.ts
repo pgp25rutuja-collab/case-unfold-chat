@@ -22,7 +22,10 @@ function createLovableAiGatewayRunIdFetch(initialRunId?: string) {
 const MODEL = "openai/gpt-6-astra";
 const BASE_URL = "https://ai.gateway.lovable.dev/v1";
 
-export async function generateProbeText(messages: ModelMessage[]): Promise<string> {
+export async function generateProbeText(
+  instructions: string,
+  messages: ModelMessage[],
+): Promise<string> {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new Error("AI is not configured for this app yet.");
 

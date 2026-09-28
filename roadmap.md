@@ -1,3 +1,3 @@
-- [ ] Finish student proctored voice session, warning capture, recording upload, transcript download.
-- [ ] Finish instructor session list, review detail, and instructor promotion.
-- [ ] Verify voice, permissions, and the end-to-end experience.
+- [x] Finish student proctored voice session, warning capture, recording upload, transcript download.
+- [x] Finish instructor session list, review detail, and instructor promotion.
+- [x] Verify voice access, device warnings, five-answer flow, saved recording, and instructor review.

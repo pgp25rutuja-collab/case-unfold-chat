@@ -46,7 +46,7 @@ function buildMessages(input: z.infer<typeof schema>): ModelMessage[] {
       content:
         "Begin. Ask your first probing question about this case — pick a genuine tension, a number that needs interpreting, a stakeholder incentive, or a hidden assumption. One question only.",
     });
-  } else if (turn >= total) {
+  } else if (turn > total) {
     messages.push({
       role: "user",
       content:
@@ -68,7 +68,7 @@ export const askProbe = createServerFn({ method: "POST" })
     const { generateProbeText } = await import("./ai.server");
     try {
       const text = await generateProbeText(SYSTEM, buildMessages(data));
-      return { text, closing: data.turn >= data.total };
+      return { text, closing: data.turn > data.total };
     } catch (error) {
       const status = (error as { statusCode?: number; status?: number })?.statusCode ??
         (error as { status?: number })?.status;

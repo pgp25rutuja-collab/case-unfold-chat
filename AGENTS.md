@@ -12,5 +12,6 @@
 ## Architecture rules
 
 - Case files (PDF/DOCX/TXT) are parsed in the browser with pdfjs-dist and mammoth — the Cloudflare Worker runtime can't run native document parsers.
-- All AI calls go through `src/lib/ai.server.ts` (Lovable AI Gateway, Responses API, streamed server-side) and are exposed to the UI only via `src/lib/probe.functions.ts`.
-- The probe session is in-memory only: no database, no persistence; the transcript is downloaded client-side.
+- AI questions go through `src/lib/ai.server.ts` and `src/lib/probe.functions.ts`; voice uses authenticated server routes — credentials must remain server-side.
+- Proctored sessions, transcripts, warnings and recordings persist in Lovable Cloud; student/instructor access is enforced by RLS and private storage policies.
+- The browser composites a stable canvas/video and microphone audio stream for one session recording, so reconnected devices do not break the recorder.

@@ -1,0 +1,3 @@
+- [ ] Finish student proctored voice session, warning capture, recording upload, transcript download.
+- [ ] Finish instructor session list, review detail, and instructor promotion.
+- [ ] Verify voice, permissions, and the end-to-end experience.

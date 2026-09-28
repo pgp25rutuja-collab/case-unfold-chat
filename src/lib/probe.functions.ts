@@ -47,12 +47,6 @@ function buildMessages(input: z.infer<typeof schema>): ModelMessage[] {
       content:
         "Begin. Ask your first probing question about this case — pick a genuine tension, a number that needs interpreting, a stakeholder incentive, or a hidden assumption. One question only.",
     });
-  } else if (turn > total) {
-    messages.push({
-      role: "user",
-      content:
-        "This is the end of the session. Do not ask another question and do not evaluate the student's answers. Write two short sentences: thank them for working through the case and note that the transcript is available to download. Polite and plain.",
-    });
   } else {
     messages.push({
       role: "user",
@@ -67,6 +61,9 @@ export const askProbe = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
+    if (data.turn > data.total) {
+      return { text: "Thank you for working through the case. Your transcript is available to download.", closing: true };
+    }
     const { generateProbeText } = await import("./ai.server");
     try {
       const text = await generateProbeText(SYSTEM, buildMessages(data));
